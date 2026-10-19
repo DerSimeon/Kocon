@@ -15,14 +15,14 @@ Gradle (Kotlin DSL):
 
 ```kotlin
 dependencies {
-    implementation("lol.simeon:kocon:1.0.0")
+    implementation("lol.simeon:kocon:0.1.0")
 }
 ```
 
 Gradle (Groovy):
 
 ```groovy
-implementation 'lol.simeon:kocon:1.0.0'
+implementation 'lol.simeon:kocon:0.1.0'
 ```
 
 Maven:
@@ -31,7 +31,7 @@ Maven:
 <dependency>
     <groupId>lol.simeon</groupId>
     <artifactId>kocon</artifactId>
-    <version>1.0.0</version>
+    <version>0.1.0</version>
 </dependency>
 ```
 
@@ -59,7 +59,7 @@ On first run this writes:
 ```hocon
 # Port the server listens on
 port = 25565
-motd = Hello
+motd = "Hello"
 ```
 
 Read, change, save, reload:
