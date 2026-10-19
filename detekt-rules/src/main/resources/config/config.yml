@@ -1,0 +1,4 @@
+kocon:
+  active: true
+  OneClassPerFile:
+    active: true
