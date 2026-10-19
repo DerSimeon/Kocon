@@ -45,10 +45,9 @@ internal class HoconParser private constructor(text: String) {
                 }
                 else -> reader.fail("Expected '=', ':' or '{' after key '${path.joinToString(".")}'")
             }
-            val nested = path.dropLast(1).foldRight(HoconObject(mapOf(path.last() to value))) { key, inner ->
-                HoconObject(mapOf(key to inner))
-            }
-            nested.entries.forEach { (key, v) -> entries[key] = merge(entries[key], v) }
+            val head = path.first()
+            val nested = path.drop(1).foldRight(value) { key, inner -> HoconObject(mapOf(key to inner)) }
+            entries[head] = merge(entries[head], nested)
             expectSeparator(close)
             reader.skipBlank(commas = true)
         }

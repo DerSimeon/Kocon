@@ -15,9 +15,10 @@ import java.nio.file.StandardCopyOption.REPLACE_EXISTING
  */
 internal fun writeAtomically(target: Path, text: String) {
     try {
-        val real = if (Files.exists(target)) target.toRealPath() else target.toAbsolutePath()
+        val exists = Files.exists(target)
+        val real = if (exists) target.toRealPath() else target.toAbsolutePath()
         // POSIX rename would silently replace a read-only file.
-        if (Files.exists(real) && !Files.isWritable(real)) {
+        if (exists && !Files.isWritable(real)) {
             throw AccessDeniedException(real.toString(), null, "not writable")
         }
         val dir = Files.createDirectories(real.parent)

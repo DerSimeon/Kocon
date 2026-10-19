@@ -33,6 +33,7 @@ internal class TreeDecoder(
     private var current = node
     private var currentPath = path
     private var cursor = 0
+    private val mapEntries by lazy { (node as HoconObject).entries.entries.toList() }
 
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
         val (child, childPath) = when (descriptor.kind) {
@@ -85,7 +86,7 @@ internal class TreeDecoder(
 
     /** Map elements alternate key, value; the key is decoded from a quoted scalar. */
     private fun mapElement(): Pair<HoconValue, String>? {
-        val (key, value) = (node as HoconObject).entries.entries.elementAtOrNull(cursor / 2) ?: return null
+        val (key, value) = mapEntries.getOrNull(cursor / 2) ?: return null
         return (if (cursor % 2 == 0) HoconScalar(key, quoted = true) else value) to join(key)
     }
 
