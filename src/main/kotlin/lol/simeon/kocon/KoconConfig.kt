@@ -5,6 +5,7 @@ import lol.simeon.kocon.io.writeAtomically
 import lol.simeon.kocon.parse.HoconParser
 import lol.simeon.kocon.render.renderHocon
 import lol.simeon.kocon.tree.HoconValue.HoconObject
+import java.io.IOException
 import java.nio.file.Files
 import kotlin.reflect.KProperty
 
@@ -33,7 +34,12 @@ class KoconConfig<T> internal constructor(private val serializer: KSerializer<T>
             if (!withDefault) throw KoconException("Config file $path does not exist")
             return decodeFromTree(serializer, HoconObject(emptyMap())).also(::write)
         }
-        val tree = HoconParser.parse(Files.readString(path, Charsets.UTF_8))
+        val text = try {
+            Files.readString(path, Charsets.UTF_8)
+        } catch (e: IOException) {
+            throw KoconException("Could not read config file $path: ${e.message}", e)
+        }
+        val tree = HoconParser.parse(text)
         val loaded = decodeFromTree(serializer, tree)
         if (withDefault && hasMissingKeys(encodeToTree(serializer, loaded), tree)) write(loaded)
         return loaded

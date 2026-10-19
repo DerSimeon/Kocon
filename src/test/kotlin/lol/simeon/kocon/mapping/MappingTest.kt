@@ -132,6 +132,23 @@ class MappingTest {
     }
 
     @Test
+    fun `scalar for an object property names the key path`() {
+        assertContains(assertFailsWith<KoconException> { decode<Root>("server = 5") }.message!!, "server")
+    }
+
+    @Test
+    fun `scalar for a list property names the key path`() {
+        assertContains(assertFailsWith<KoconException> { decode<Defaults>("tags = 1") }.message!!, "tags")
+    }
+
+    @Test
+    fun `null for a non-null property names the key path`() {
+        assertContains(assertFailsWith<KoconException> { decode<Root>("port = null") }.message!!, "port")
+        val nested = assertFailsWith<KoconException> { decode<Root>("server { port = null }") }
+        assertContains(nested.message!!, "server.port")
+    }
+
+    @Test
     fun `unknown keys are ignored`() {
         assertEquals(Root(port = 5), decode<Root>("old = true\nport = 5"))
     }

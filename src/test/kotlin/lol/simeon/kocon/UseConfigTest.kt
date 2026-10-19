@@ -9,6 +9,7 @@ import java.nio.file.Path
 import kotlin.io.path.exists
 import kotlin.io.path.readBytes
 import kotlin.io.path.readText
+import kotlin.io.path.writeBytes
 import kotlin.io.path.writeText
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -135,6 +136,25 @@ class UseConfigTest {
         file.writeText("port = 9\nmotd = x\n")
         config.reload()
         assertEquals(Server(9, "x"), config.value)
+    }
+
+    @Test
+    fun `reload of an invalid file throws and keeps the previous value and bytes`() {
+        file.writeText("port = 8\nmotd = ok\n")
+        val config = useConfig<Server> { path = file }
+        file.writeText("port = {")
+        val before = file.readBytes()
+        assertFailsWith<KoconException> { config.reload() }
+        assertEquals(Server(8, "ok"), config.value)
+        assertContentEquals(before, file.readBytes())
+    }
+
+    @Test
+    fun `invalid UTF-8 throws KoconException and leaves the bytes unchanged`() {
+        val bytes = byteArrayOf(0xC3.toByte(), 0x28)
+        file.writeBytes(bytes)
+        assertFailsWith<KoconException> { useConfig<Server> { path = file; withDefault = true } }
+        assertContentEquals(bytes, file.readBytes())
     }
 
     @Test
